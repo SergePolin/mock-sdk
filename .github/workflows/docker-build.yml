@@ -29,7 +29,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: ${{ secrets.REGISTRY_LOGIN_SERVER }}/neuroartistbot:${{ github.sha }}
+          tags: ${{ secrets.REGISTRY_LOGIN_SERVER }}/mocksdk:${{ github.sha }}
           file: Dockerfile
 
       # New step: Login to Azure to perform ACI operations
@@ -41,15 +41,15 @@ jobs:
       # New step: Delete current ACI instance
       - name: "Delete current ACI instance (if exists)"
         run: |
-          az container delete --name neuroartistbot --resource-group newEra --yes || echo "No existing container to delete"
+          az container delete --name mocksdk --resource-group newEra --yes || echo "No existing container to delete"
 
       # New step: Deploy the latest image to ACI
       - name: "Deploy latest image to ACI"
         run: |
           az container create \
             --resource-group newEra \
-            --name neuroartistbot \
-            --image ${{ secrets.REGISTRY_LOGIN_SERVER }}/neuroartistbot:${{ github.sha }} \
+            --name mocksdk \
+            --image ${{ secrets.REGISTRY_LOGIN_SERVER }}/mocksdk:${{ github.sha }} \
             --registry-login-server ${{ secrets.REGISTRY_LOGIN_SERVER }} \
             --registry-username ${{ secrets.REGISTRY_USERNAME }} \
             --registry-password ${{ secrets.REGISTRY_PASSWORD }} \
