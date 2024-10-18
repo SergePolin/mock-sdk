@@ -1,0 +1,17 @@
+{
+    "name": "mock-server",
+    "version": "1.0.0",
+    "description": "A basic mock server using Express",
+    "main": "app.js",
+    "scripts": {
+        "start": "node app.js",
+        "start:prod": "NODE_ENV=production node app.js"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "express": "^4.21.1",
+        "uuid": "^8.3.2"
+    }
+}

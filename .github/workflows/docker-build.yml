@@ -1,0 +1,58 @@
+name: Build and Push to ACR and Deploy to ACI
+
+on:
+  push:
+    branches:
+      - "main"
+
+jobs:
+  build:
+    name: "Build and Push to ACR and Deploy to ACI"
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Docker Login
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Build the image and push it to ACR
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: ${{ secrets.REGISTRY_LOGIN_SERVER }}/neuroartistbot:${{ github.sha }}
+          file: Dockerfile
+
+      # New step: Login to Azure to perform ACI operations
+      - name: "Log in to Azure"
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # New step: Delete current ACI instance
+      - name: "Delete current ACI instance (if exists)"
+        run: |
+          az container delete --name neuroartistbot --resource-group newEra --yes || echo "No existing container to delete"
+
+      # New step: Deploy the latest image to ACI
+      - name: "Deploy latest image to ACI"
+        run: |
+          az container create \
+            --resource-group newEra \
+            --name neuroartistbot \
+            --image ${{ secrets.REGISTRY_LOGIN_SERVER }}/neuroartistbot:${{ github.sha }} \
+            --registry-login-server ${{ secrets.REGISTRY_LOGIN_SERVER }} \
+            --registry-username ${{ secrets.REGISTRY_USERNAME }} \
+            --registry-password ${{ secrets.REGISTRY_PASSWORD }} \
+            --cpu 1 \
+            --memory 1.5 \
+            --os-type Linux
