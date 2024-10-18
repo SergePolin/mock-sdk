@@ -9,6 +9,10 @@ app.use(express.json());
 // Use routes
 app.use('/api', routes);
 
+app.get('/', (req, res) => {
+    res.send('Hello World');
+});
+
 // Basic error handling
 app.use((err, req, res, next) => {
     console.error(err.stack);

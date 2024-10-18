@@ -55,4 +55,11 @@ jobs:
             --registry-password ${{ secrets.REGISTRY_PASSWORD }} \
             --cpu 1 \
             --memory 1.5 \
-            --os-type Linux
+            --os-type Linux \
+            --ip-address Public \
+            --dns-name-label mocksdk-${{ github.sha }}
+
+      # New step: Output the FQDN of the deployed container
+      - name: "Get FQDN of deployed container"
+        run: |
+          echo "Container FQDN: $(az container show --resource-group newEra --name mocksdk --query ipAddress.fqdn --output tsv)"
