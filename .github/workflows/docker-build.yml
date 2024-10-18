@@ -57,7 +57,7 @@ jobs:
             --memory 1.5 \
             --os-type Linux \
             --ip-address Public \
-            --dns-name-label mocksdk-${{ github.sha }}
+            --dns-name-label mocksdk
 
       # New step: Output the FQDN of the deployed container
       - name: "Get FQDN of deployed container"
